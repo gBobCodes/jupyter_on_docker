@@ -1,0 +1,70 @@
+# DEVELOPMENT ENV ONLY. NOT PRODUCTION.
+version: '3.7'
+
+services:
+  # Anaconda
+  conda:
+    build: .
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    ports:
+      - ${ANACONDA_PORT}:8888
+    volumes:
+        - ./notebooks/:/opt/notebooks
+    networks:
+      - conda-network
+
+  # DB administration tool
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - ${DB_ADMIN_PORT}:8080
+    networks:
+      - conda-network
+  
+  # Postgres DB Service
+#   postgresdb:
+#     image: postgres:12.0-alpine
+#     restart: unless-stopped
+#     volumes:
+#       - conda_postgres_data:/var/lib/postgresql/data/
+#     environment:
+#       - POSTGRES_USER=${SQL_USER}
+#       - POSTGRES_PASSWORD=${SQL_PASSWORD}
+#       - POSTGRES_DB=${SQL_DATABASE}
+#     ports:
+#       - ${SQL_PORT}:5432
+#     networks:
+#       - conda-network
+
+  # MySQL DB Service
+  # mysqldb:
+  #   image: mysql:5.7
+  #   restart: unless-stopped
+  #   tty: true
+  #   ports:
+  #     - ${MYSQL_DB_PORT}:3306
+  #   environment:
+  #     MYSQL_DATABASE: ${MYSQL_DB_DATABASE}
+  #     MYSQL_USER: ${MYSQL_DB_USERNAME}
+  #     MYSQL_PASSWORD: ${MYSQL_DB_PASSWORD}
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_DB_ROOTPASSWORD}
+  #     SERVICE_NAME: mysql
+  #     SERVICE_TAGS: dev
+  #   volumes:
+  #     - conda_mysql_data:/var/lib/mysql/
+  #     - ./mysql/my.cnf:/etc/mysql/my.cnf
+  #   networks:
+  #     - conda-network
+
+# Docker Networks
+networks:
+  conda-network:
+    driver: bridge
+
+# Save the data when containers are shut down
+# volumes:
+#   conda_postgres_data:
+#   conda_mysql_data:
